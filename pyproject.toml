@@ -1,0 +1,36 @@
+[project]
+name = "secreton-api-client"
+version = "0.1.0"
+description = "secreton.ru api python wrapper"
+readme = "README.md"
+authors = [
+    { name = "saner99", email = "it@saner99.ru" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "httpx>=0.28.1",
+    "pydantic>=2.11.7",
+]
+
+[project.scripts]
+secreton-api-client = "secreton_api_client:main"
+
+[build-system]
+requires = ["uv_build>=0.8.11,<0.9.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "coverage>=7.10.6",
+    "flake8>=7.3.0",
+    "isort>=6.0.1",
+    "mypy>=1.17.1",
+    "pre-commit>=4.3.0",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.1.0",
+    "respx>=0.22.0",
+]
+
+[tool.hatch.version]
+path = "src/secreton_api_client/_version.py"
