@@ -373,7 +373,7 @@ async def main():
 
     # Configuration
     BASE_URL = os.getenv("SECRETON_API_URL", "http://176.114.89.94:5648")
-    TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMGE2Y2E5OWQtMmQ1Yy00YmY5LWJhYzctZTU3NDc5NzIzZTE2IiwiY3JlYXRlZF9hdCI6MTc1NzMwMTI2OX0.cBUPpwfoBa70eRut3lH3WPexYVyJTaHwGFMnRPRFmrA"  # os.getenv("SECRETON_API_TOKEN")  # Optional
+    TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMGE2Y2E5OWQtMmQ1Yy00YmY5LWJhYzctZTU3NDc5NzIzZTE2IiwiY3JlYXRlZF9hdCI6MTc1Nzc2OTcxOX0.c2_xRqpd3BJkAI-Pov-cLkgOKp_xoOl_prPK9Ry4JJk"  # os.getenv("SECRETON_API_TOKEN")  # Optional
 
     if not TOKEN:
         print("⚠️ No SECRETON_API_TOKEN found. Some tests will be skipped.")

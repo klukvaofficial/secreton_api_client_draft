@@ -5,6 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+
 class UserProfile(BaseModel):
     """User profile information."""
 
@@ -16,10 +17,11 @@ class UserProfile(BaseModel):
     last_name: Optional[str] = None
     created_at: Optional[str] = None  # datetime as string
 
+
 class BalanceTopupResponse(BaseModel):
     """Response from balance top-up."""
 
-    payment_id: UUID
+    id: UUID
     amount: float = Field(ge=0)
     status: str
     payment_url: Optional[str] = None
