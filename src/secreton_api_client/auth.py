@@ -23,7 +23,7 @@ class BearerAuth(httpx.Auth):
         Yields:
             Authenticated request
         """
-        request.headers["Authorization"] = f"Bearer {self.token}"
+        request.headers["Auth"] = f"Bearer {self.token}"
         yield request
 
 
@@ -47,5 +47,5 @@ class SecretOnAuth(httpx.Auth):
         Yields:
             Authenticated request
         """
-        request.headers["Authorization"] = f"Bearer {self.token}"
+        request.headers["Auth"] = f"Bearer {self.token}"
         yield request
