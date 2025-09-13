@@ -1,5 +1,5 @@
 [project]
-name = "secreton-api-client"
+name = "secreton_api_client"
 version = "0.1.0"
 description = "secreton.ru api python wrapper"
 readme = "README.md"
@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-secreton-api-client = "secreton_api_client:main"
+secreton_api_client = "secreton_api_client:main"
 
 [build-system]
 requires = ["uv_build>=0.8.11,<0.9.0"]
