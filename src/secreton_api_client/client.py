@@ -11,7 +11,7 @@ from .services import AuthService, OrdersService, ProfileService
 logger = logging.getLogger(__name__)
 
 
-class SecretOnClient:
+class SyncSecretOnClient:
     """Main client for Secreton API.
 
     This is the primary interface for interacting with the Secreton API.
@@ -107,7 +107,7 @@ class SecretOnClient:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Async context manager exit."""
-        await self.close()
+        self.close()
 
     async def close(self) -> None:
         """Close HTTP client connection.
@@ -115,12 +115,11 @@ class SecretOnClient:
         This should be called when you're done using the client
         to properly close the underlying HTTP connection.
         """
-        await self.http_client.close()
+        self.http_client.close()
         logger.info("Secreton client closed")
 
-
 class AsyncSecretOnClient:
-    """Async client for Secreton API.
+    """Main client for Secreton API.
 
     This is the primary interface for interacting with the Secreton API.
     It provides access to all service endpoints through a unified interface.
