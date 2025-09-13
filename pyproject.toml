@@ -1,6 +1,6 @@
 [project]
 name = "secreton_api_client"
-version = "0.1.1"
+version = "0.1.2"
 description = "secreton.ru api python wrapper"
 readme = "README.md"
 authors = [
