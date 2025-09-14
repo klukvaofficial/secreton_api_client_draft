@@ -2,7 +2,7 @@
 
 from ._version import __version__
 from .auth import BearerAuth, SecretOnAuth
-from .client import AsyncSecretOnClient, SyncSecretOnClient
+from .client import SyncSecretOnClient, AsyncSecretOnClient
 from .exceptions import (
     APIClientError,
     AuthenticationError,
@@ -15,8 +15,8 @@ from .exceptions import (
 
 __all__ = [
     "__version__",
-    "AsyncSecretOnClient",
     "SyncSecretOnClient",
+    "AsyncSecretOnClient",
     "BearerAuth",
     "SecretOnAuth",
     "APIClientError",

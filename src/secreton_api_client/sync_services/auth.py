@@ -1,11 +1,11 @@
-"""Authentication service for Secreton API."""
+"""Synchronous authentication service for Secreton API."""
 
 from typing import Dict, Optional, Union
 from uuid import UUID
 
 import httpx
 
-from ..http_client import HTTPClient
+from ..sync_http_client import SyncHTTPClient
 from ..models.auth import (
     LoginResponse,
     PasswordSetResponse,
@@ -13,10 +13,10 @@ from ..models.auth import (
     RegisterResponse,
 )
 
-class AuthService:
-    """Service for authentication operations."""
+class SyncAuthService:
+    """Synchronous service for authentication operations."""
 
-    def __init__(self, http_client: HTTPClient) -> None:
+    def __init__(self, http_client: SyncHTTPClient) -> None:
         """Initialize authentication service.
 
         Args:
@@ -25,7 +25,7 @@ class AuthService:
         self.http_client = http_client
         self.endpoint_base = "/api/auth"
 
-    async def login(self, phone: int) -> RegisterResponse:
+    def login(self, phone: int) -> RegisterResponse:
         """Initiate login process with phone number.
 
         Args:
@@ -44,10 +44,10 @@ class AuthService:
         endpoint = f"{self.endpoint_base}/login"
         data = {"phone": phone}
 
-        response = await self.http_client.post(endpoint, json_data=data)
+        response = self.http_client.post(endpoint, json_data=data)
         return RegisterResponse(**response.json())
 
-    async def password_login(self, phone: int, password: str) -> LoginResponse:
+    def password_login(self, phone: int, password: str) -> LoginResponse:
         """Login with phone and password.
 
         Args:
@@ -61,16 +61,16 @@ class AuthService:
             AuthenticationError: If credentials are invalid
             ValidationError: If phone number is invalid
         """
-        if not (70000000000 <= phone <= 79999999999):
-            raise ValueError("Phone number must be between 70000000000 and 79999999999")
+        if not (79000000000 <= phone <= 79999999999):
+            raise ValueError("Phone number must be between 79000000000 and 79999999999")
 
         endpoint = f"{self.endpoint_base}/password_login"
         data = {"phone": phone, "password": password}
 
-        response = await self.http_client.post(endpoint, json_data=data)
+        response = self.http_client.post(endpoint, json_data=data)
         return LoginResponse(**response.json())
 
-    async def phone_confirmation(
+    def phone_confirmation(
         self,
         request_id: Union[str, UUID],
         code: int
@@ -94,10 +94,10 @@ class AuthService:
         endpoint = f"{self.endpoint_base}/phone_confirmation"
         data = {"request_id": str(request_id), "code": code}
 
-        response = await self.http_client.post(endpoint, json_data=data)
+        response = self.http_client.post(endpoint, json_data=data)
         return PhoneConfirmationResponse(**response.json())
 
-    async def set_password(
+    def set_password(
         self,
         request_id: Union[str, UUID],
         password: str
@@ -121,10 +121,10 @@ class AuthService:
         endpoint = f"{self.endpoint_base}/password"
         data = {"request_id": str(request_id), "password": password}
 
-        response = await self.http_client.post(endpoint, json_data=data)
+        response = self.http_client.post(endpoint, json_data=data)
         return PasswordSetResponse(**response.json())
 
-    async def send_code(self, request_id: Union[str, UUID]) -> Dict:
+    def send_code(self, request_id: Union[str, UUID]) -> Dict:
         """Resend SMS confirmation code.
 
         Args:
@@ -140,10 +140,10 @@ class AuthService:
         endpoint = f"{self.endpoint_base}/send_code"
         data = {"request_id": str(request_id)}
 
-        response = await self.http_client.post(endpoint, json_data=data)
+        response = self.http_client.post(endpoint, json_data=data)
         return response.json()
 
-    async def logout(self, auth: httpx.Auth) -> Dict:
+    def logout(self, auth: httpx.Auth) -> Dict:
         """Logout current user.
 
         Args:
@@ -157,5 +157,5 @@ class AuthService:
         """
         endpoint = f"{self.endpoint_base}/logout"
 
-        response = await self.http_client.post(endpoint, auth=auth)
+        response = self.http_client.post(endpoint, auth=auth)
         return response.json()

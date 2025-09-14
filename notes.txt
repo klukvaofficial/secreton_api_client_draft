@@ -1,0 +1,611 @@
+"""Authentication-related data models."""
+
+from typing import Optional
+from uuid import UUID
+
+from pydantic import BaseModel
+
+
+class RegisterResponse(BaseModel):
+    """Response from user registration."""
+
+    request_id: UUID
+
+
+class LoginResponse(BaseModel):
+    """Response from user login."""
+
+    request_id: Optional[UUID] = None
+    token: Optional[str] = None
+    user_id: Optional[UUID] = None
+
+
+class PhoneConfirmationResponse(BaseModel):
+    """Response from phone confirmation."""
+
+    success: bool
+    message: Optional[str] = None
+
+
+class PasswordSetResponse(BaseModel):
+    """Response from password setting."""
+
+    success: bool
+    token: Optional[str] = None
+
+"""Order-related data models."""
+
+from datetime import datetime
+from typing import List, Optional
+from uuid import UUID
+
+from pydantic import BaseModel, Field
+
+
+class OrderTagModel(BaseModel):
+    """Order tag model."""
+
+    id: UUID
+    name: str
+
+
+class OrderCommentModel(BaseModel):
+    """Order comment model."""
+
+    id: UUID
+    text: str
+    created_at: Optional[datetime] = None
+
+
+class OrderViewModel(BaseModel):
+    """Complete order view model."""
+
+    order_id: UUID
+    service_type: UUID
+    status: str
+    price: float = Field(ge=0)
+    created_at: datetime
+    tags: List[OrderTagModel] = Field(default_factory=list)
+    comments: List[OrderCommentModel] = Field(default_factory=list)
+
+
+class OrderCreateResponse(BaseModel):
+    """Response from order creation."""
+
+    order_id: UUID
+    message: Optional[str] = None
+
+
+class ServiceType(BaseModel):
+    """Available service type."""
+
+    id: int
+    name: str
+    description: Optional[str] = None
+    price: Optional[float] = None
+
+"""Profile service for Secreton API."""
+
+from typing import Optional
+from uuid import UUID
+
+import httpx
+
+from ..http_client import HTTPClient
+from ..models.profile import BalanceTopupResponse, UserProfile
+
+class ProfileService:
+    """Service for profile operations."""
+
+    def __init__(self, http_client: HTTPClient) -> None:
+        """Initialize profile service.
+
+        Args:
+            http_client: HTTP client instance
+        """
+        self.http_client = http_client
+        self.endpoint_base = "/api/profile"
+
+    async def get_profile(self, auth: httpx.Auth, user_id: Optional[UUID] = None) -> UserProfile:
+        """Get user profile information.
+
+        Args:
+            auth: Authentication object
+            user_id: Optional user ID (if not provided, returns current user)
+
+        Returns:
+            User profile data
+
+        Raises:
+            AuthenticationError: If not authorized
+            NotFoundError: If user doesn't exist
+        """
+        endpoint = f"{self.endpoint_base}/profile"
+        params = {}
+
+        if user_id:
+            params["user_id"] = str(user_id)
+
+        response = await self.http_client.get(
+            endpoint,
+            auth=auth,
+            params=params if params else None
+        )
+        return UserProfile(**response.json())
+
+    async def topup_balance(
+        self,
+        amount: float,
+        auth: httpx.Auth,
+        user_id: Optional[UUID] = None
+    ) -> BalanceTopupResponse:
+        """Top up user balance.
+
+        Args:
+            amount: Amount to top up (minimum: 10)
+            auth: Authentication object
+            user_id: Optional user ID (if not provided, tops up current user)
+
+        Returns:
+            Balance top-up response with payment information
+
+        Raises:
+            ValueError: If amount is less than minimum
+            AuthenticationError: If not authorized
+        """
+        if amount < 10:
+            raise ValueError("Amount must be at least 10")
+
+        endpoint = f"{self.endpoint_base}/topup"
+        params = {"amount": amount}
+
+        if user_id:
+            params["user_id"] = str(user_id)
+
+        response = await self.http_client.get(endpoint, auth=auth, params=params)
+        return BalanceTopupResponse(**response.json())
+
+        """Authentication service for Secreton API."""
+
+from typing import Dict, Optional, Union
+from uuid import UUID
+
+import httpx
+
+from ..http_client import HTTPClient
+from ..models.auth import (
+    LoginResponse,
+    PasswordSetResponse,
+    PhoneConfirmationResponse,
+    RegisterResponse,
+)
+
+class AuthService:
+    """Service for authentication operations."""
+
+    def __init__(self, http_client: HTTPClient) -> None:
+        """Initialize authentication service.
+
+        Args:
+            http_client: HTTP client instance
+        """
+        self.http_client = http_client
+        self.endpoint_base = "/api/auth"
+
+    async def login(self, phone: int) -> RegisterResponse:
+        """Initiate login process with phone number.
+
+        Args:
+            phone: Phone number for login
+
+        Returns:
+            Login response with request_id
+
+        Raises:
+            ValidationError: If phone number is invalid
+            APIClientError: If request fails
+        """
+        if not (79000000000 <= phone <= 79999999999):
+            raise ValueError("Phone number must be between 79000000000 and 79999999999")
+
+        endpoint = f"{self.endpoint_base}/login"
+        data = {"phone": phone}
+
+        response = await self.http_client.post(endpoint, json_data=data)
+        return RegisterResponse(**response.json())
+
+    async def password_login(self, phone: int, password: str) -> LoginResponse:
+        """Login with phone and password.
+
+        Args:
+            phone: Phone number
+            password: User password
+
+        Returns:
+            Login response with token
+
+        Raises:
+            AuthenticationError: If credentials are invalid
+            ValidationError: If phone number is invalid
+        """
+        if not (70000000000 <= phone <= 79999999999):
+            raise ValueError("Phone number must be between 70000000000 and 79999999999")
+
+        endpoint = f"{self.endpoint_base}/password_login"
+        data = {"phone": phone, "password": password}
+
+        response = await self.http_client.post(endpoint, json_data=data)
+        return LoginResponse(**response.json())
+
+    async def phone_confirmation(
+        self,
+        request_id: Union[str, UUID],
+        code: int
+    ) -> PhoneConfirmationResponse:
+        """Confirm phone number with SMS code.
+
+        Args:
+            request_id: Request ID from login response
+            code: SMS confirmation code (0-9999)
+
+        Returns:
+            Phone confirmation response
+
+        Raises:
+            ValidationError: If code is invalid
+            AuthenticationError: If confirmation fails
+        """
+        if not (0 <= code <= 9999):
+            raise ValueError("Code must be between 0 and 9999")
+
+        endpoint = f"{self.endpoint_base}/phone_confirmation"
+        data = {"request_id": str(request_id), "code": code}
+
+        response = await self.http_client.post(endpoint, json_data=data)
+        return PhoneConfirmationResponse(**response.json())
+
+    async def set_password(
+        self,
+        request_id: Union[str, UUID],
+        password: str
+    ) -> PasswordSetResponse:
+        """Set password after phone confirmation.
+
+        Args:
+            request_id: Request ID from login response
+            password: New password to set
+
+        Returns:
+            Password set response with token
+
+        Raises:
+            ValidationError: If password is invalid
+            AuthenticationError: If request_id is invalid
+        """
+        if len(password) < 6:
+            raise ValueError("Password must be at least 6 characters long")
+
+        endpoint = f"{self.endpoint_base}/password"
+        data = {"request_id": str(request_id), "password": password}
+
+        response = await self.http_client.post(endpoint, json_data=data)
+        return PasswordSetResponse(**response.json())
+
+    async def send_code(self, request_id: Union[str, UUID]) -> Dict:
+        """Resend SMS confirmation code.
+
+        Args:
+            request_id: Request ID from login response
+
+        Returns:
+            Code sending response
+
+        Raises:
+            AuthenticationError: If request_id is invalid
+            RateLimitError: If too many requests
+        """
+        endpoint = f"{self.endpoint_base}/send_code"
+        data = {"request_id": str(request_id)}
+
+        response = await self.http_client.post(endpoint, json_data=data)
+        return response.json()
+
+    async def logout(self, auth: httpx.Auth) -> Dict:
+        """Logout current user.
+
+        Args:
+            auth: Authentication object with valid token
+
+        Returns:
+            Logout response
+
+        Raises:
+            AuthenticationError: If token is invalid
+        """
+        endpoint = f"{self.endpoint_base}/logout"
+
+        response = await self.http_client.post(endpoint, auth=auth)
+        return response.json()
+
+        """Orders service for Secreton API."""
+
+from pathlib import Path
+from typing import BinaryIO, Dict, List, Optional, Union
+from uuid import UUID
+
+import httpx
+
+from ..http_client import HTTPClient
+from ..models.orders import OrderCreateResponse, OrderViewModel, ServiceType
+
+
+class OrdersService:
+    """Service for order operations."""
+
+    def __init__(self, http_client: HTTPClient) -> None:
+        """Initialize orders service.
+
+        Args:
+            http_client: HTTP client instance
+        """
+        self.http_client = http_client
+        self.endpoint_base = "/api/orders"
+
+    async def create_order(
+        self,
+        order_name: str,
+        service_type: int,
+        file: Union[BinaryIO, Path, str],
+        auth: httpx.Auth,
+        comments: Optional[List[str]] = None,
+        tags: Optional[List[str]] = None,
+        not_save: bool = False,
+    ) -> OrderCreateResponse:
+        """Create new order with file upload.
+
+        Args:
+            name: Order name
+            service_type: Service type ID
+            file: File object, Path, or file path string
+            auth: Authentication object
+            comments: Optional list of comments
+            tags: Optional list of tags
+            not_save: Don't save file flag
+
+        Returns:
+            Order creation response
+
+        Raises:
+            FileNotFoundError: If file doesn't exist
+            ValidationError: If parameters are invalid
+        """
+        # Handle different file input types
+        if isinstance(file, (str, Path)):
+            file_path = Path(file)
+            if not file_path.exists():
+                raise FileNotFoundError(f"File not found: {file_path}")
+            if not file_path.is_file():
+                raise ValueError(f"Path is not a file: {file_path}")
+            file_obj = file_path.open("rb")
+            filename = file_path.name
+        else:
+            file_obj = file
+            filename = getattr(file, "name", "upload")
+
+        try:
+            # Prepare multipart form data
+            files = {"file": (filename, file_obj, "application/octet-stream")}
+            form_data = {
+                "name": order_name,
+                "service_type": service_type,
+                "not_save": not_save,
+            }
+
+            if comments:
+                form_data["comments"] = comments
+            if tags:
+                form_data["tags"] = tags
+
+            endpoint = f"{self.endpoint_base}/new"
+            response = await self.http_client.post(
+                endpoint, auth=auth, form_data=form_data, files=files
+            )
+
+            return OrderCreateResponse(**response.json())
+
+        finally:
+            # Close file if we opened it
+            if isinstance(file, (str, Path)):
+                file_obj.close()
+
+    async def get_order(
+        self, order_id: Union[str, UUID], auth: httpx.Auth
+    ) -> OrderViewModel:
+        """Get order details by ID.
+
+        Args:
+            order_id: Order ID
+            auth: Authentication object
+
+        Returns:
+            Order details
+
+        Raises:
+            NotFoundError: If order doesn't exist
+            AuthenticationError: If not authorized
+        """
+        endpoint = f"{self.endpoint_base}/view"
+        params = {"order_id": str(order_id)}
+
+        response = await self.http_client.get(endpoint, auth=auth, params=params)
+        return OrderViewModel(**response.json())
+
+    async def list_orders(
+        self,
+        auth: httpx.Auth,
+        service_type: Optional[str] = None,
+        status: Optional[str] = None,
+        tags: Optional[List[str]] = None,
+        order: Optional[str] = None,
+        page: int = 1,
+    ) -> List[OrderViewModel]:
+        """List orders with optional filters.
+
+        Args:
+            auth: Authentication object
+            service_type: Filter by service type
+            status: Filter by status
+            tags: Filter by tags
+            order: Sort order
+            page: Page number
+
+        Returns:
+            List of orders
+        """
+        endpoint = f"{self.endpoint_base}/"
+        params = {"page": page}
+
+        if service_type:
+            params["service_type"] = service_type
+        if status:
+            params["status"] = status
+        if tags:
+            params["tags"] = tags
+        if order:
+            params["order"] = order
+
+        response = await self.http_client.get(endpoint, auth=auth, params=params)
+        return [OrderViewModel(**order) for order in response.json()]
+
+    async def pay_order(self, order_id: Union[str, UUID], auth: httpx.Auth) -> Dict:
+        """Pay for an order.
+
+        Args:
+            order_id: Order ID to pay
+            auth: Authentication object
+
+        Returns:
+            Payment response
+        """
+        endpoint = f"{self.endpoint_base}/pay"
+        form_data = {"order_id": str(order_id)}
+
+        response = await self.http_client.post(
+            endpoint,
+            auth=auth,
+            form_data=form_data,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+        return response.json()
+
+    async def get_service_types(self, auth: httpx.Auth) -> List[ServiceType]:
+        """Get available service types.
+
+        Args:
+            auth: Authentication object
+
+        Returns:
+            List of service types
+        """
+        endpoint = f"{self.endpoint_base}/service_types"
+
+        response = await self.http_client.get(endpoint, auth=auth)
+        return [ServiceType(**st) for st in response.json()]
+
+    async def summarize_order(
+        self, order_id: Union[str, UUID], auth: httpx.Auth
+    ) -> Dict:
+        """Create order summary.
+
+        Args:
+            order_id: Order ID to summarize
+            auth: Authentication object
+
+        Returns:
+            Summary response
+        """
+        endpoint = f"{self.endpoint_base}/order/{order_id}/summarize"
+
+        response = await self.http_client.post(endpoint, auth=auth)
+        return response.json()
+
+"""Profile service for Secreton API."""
+
+from typing import Optional
+from uuid import UUID
+
+import httpx
+
+from ..http_client import HTTPClient
+from ..models.profile import BalanceTopupResponse, UserProfile
+
+class ProfileService:
+    """Service for profile operations."""
+
+    def __init__(self, http_client: HTTPClient) -> None:
+        """Initialize profile service.
+
+        Args:
+            http_client: HTTP client instance
+        """
+        self.http_client = http_client
+        self.endpoint_base = "/api/profile"
+
+    async def get_profile(self, auth: httpx.Auth, user_id: Optional[UUID] = None) -> UserProfile:
+        """Get user profile information.
+
+        Args:
+            auth: Authentication object
+            user_id: Optional user ID (if not provided, returns current user)
+
+        Returns:
+            User profile data
+
+        Raises:
+            AuthenticationError: If not authorized
+            NotFoundError: If user doesn't exist
+        """
+        endpoint = f"{self.endpoint_base}/profile"
+        params = {}
+
+        if user_id:
+            params["user_id"] = str(user_id)
+
+        response = await self.http_client.get(
+            endpoint,
+            auth=auth,
+            params=params if params else None
+        )
+        return UserProfile(**response.json())
+
+    async def topup_balance(
+        self,
+        amount: float,
+        auth: httpx.Auth,
+        user_id: Optional[UUID] = None
+    ) -> BalanceTopupResponse:
+        """Top up user balance.
+
+        Args:
+            amount: Amount to top up (minimum: 10)
+            auth: Authentication object
+            user_id: Optional user ID (if not provided, tops up current user)
+
+        Returns:
+            Balance top-up response with payment information
+
+        Raises:
+            ValueError: If amount is less than minimum
+            AuthenticationError: If not authorized
+        """
+        if amount < 10:
+            raise ValueError("Amount must be at least 10")
+
+        endpoint = f"{self.endpoint_base}/topup"
+        params = {"amount": amount}
+
+        if user_id:
+            params["user_id"] = str(user_id)
+
+        response = await self.http_client.get(endpoint, auth=auth, params=params)
+        return BalanceTopupResponse(**response.json())

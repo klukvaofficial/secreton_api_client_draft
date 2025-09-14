@@ -6,27 +6,29 @@ from typing import Optional
 from ._version import __version__
 from .auth import SecretOnAuth
 from .http_client import HTTPClient
+from .sync_http_client import SyncHTTPClient
 from .services import AuthService, OrdersService, ProfileService
+from .sync_services import SyncAuthService, SyncOrdersService, SyncProfileService
 
 logger = logging.getLogger(__name__)
 
 
 class SyncSecretOnClient:
-    """Main client for Secreton API.
+    """Synchronous client for Secreton API.
 
-    This is the primary interface for interacting with the Secreton API.
+    This is the primary interface for interacting with the Secreton API synchronously.
     It provides access to all service endpoints through a unified interface.
 
     Example:
-        async with SecretOnClient("https://api.secreton.ru") as client:
+        with SyncSecretOnClient("https://api.secreton.ru") as client:
             # Login
-            login_resp = await client.auth.login(phone=79123456789)
+            login_resp = client.auth.login(phone=79123456789)
 
             # Set token after authentication
             client.set_token("your-auth-token")
 
             # Use authenticated services
-            profile = await client.profile.get_profile()
+            profile = client.profile.get_profile(auth=client.get_auth())
     """
 
     def __init__(
@@ -50,7 +52,7 @@ class SyncSecretOnClient:
         self.token = token
 
         # Initialize HTTP client
-        self.http_client = HTTPClient(
+        self.http_client = SyncHTTPClient(
             base_url=base_url,
             timeout=timeout,
             verify_ssl=verify_ssl,
@@ -61,18 +63,18 @@ class SyncSecretOnClient:
         self._auth = SecretOnAuth(token) if token else None
 
         # Initialize services
-        self.auth = AuthService(self.http_client)
+        self.auth = SyncAuthService(self.http_client)
 
         # Initialize authenticated services if token is provided
         if self.token:
             self._init_authenticated_services()
 
-        logger.info(f"Initialized Secreton client for {base_url}")
+        logger.info(f"Initialized Secreton sync client for {base_url}")
 
     def _init_authenticated_services(self) -> None:
         """Initialize services that require authentication."""
-        self.profile = ProfileService(self.http_client)
-        self.orders = OrdersService(self.http_client)
+        self.profile = SyncProfileService(self.http_client)
+        self.orders = SyncOrdersService(self.http_client)
 
     def set_token(self, token: str) -> None:
         """Set or update authentication token.
@@ -101,31 +103,31 @@ class SyncSecretOnClient:
         """
         return self._auth
 
-    async def __aenter__(self):
-        """Async context manager entry."""
+    def __enter__(self):
+        """Context manager entry."""
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Async context manager exit."""
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit."""
         self.close()
 
-    async def close(self) -> None:
+    def close(self) -> None:
         """Close HTTP client connection.
 
         This should be called when you're done using the client
         to properly close the underlying HTTP connection.
         """
         self.http_client.close()
-        logger.info("Secreton client closed")
+        logger.info("Secreton sync client closed")
 
 class AsyncSecretOnClient:
-    """Main client for Secreton API.
+    """Asynchronous client for Secreton API.
 
-    This is the primary interface for interacting with the Secreton API.
+    This is the primary interface for interacting with the Secreton API asynchronously.
     It provides access to all service endpoints through a unified interface.
 
     Example:
-        async with SecretOnClient("https://api.secreton.ru") as client:
+        async with AsyncSecretOnClient("https://api.secreton.ru") as client:
             # Login
             login_resp = await client.auth.login(phone=79123456789)
 
@@ -133,7 +135,7 @@ class AsyncSecretOnClient:
             client.set_token("your-auth-token")
 
             # Use authenticated services
-            profile = await client.profile.get_profile()
+            profile = await client.profile.get_profile(auth=client.get_auth())
     """
 
     def __init__(
@@ -174,7 +176,7 @@ class AsyncSecretOnClient:
         if self.token:
             self._init_authenticated_services()
 
-        logger.info(f"Initialized Secreton client for {base_url}")
+        logger.info(f"Initialized Secreton async client for {base_url}")
 
     def _init_authenticated_services(self) -> None:
         """Initialize services that require authentication."""
@@ -223,4 +225,4 @@ class AsyncSecretOnClient:
         to properly close the underlying HTTP connection.
         """
         await self.http_client.close()
-        logger.info("Secreton client closed")
+        logger.info("Secreton async client closed")
