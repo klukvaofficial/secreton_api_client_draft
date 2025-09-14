@@ -61,8 +61,8 @@ class AuthService:
             AuthenticationError: If credentials are invalid
             ValidationError: If phone number is invalid
         """
-        if not (79000000000 <= phone <= 79999999999):
-            raise ValueError("Phone number must be between 79000000000 and 79999999999")
+        if not (70000000000 <= phone <= 79999999999):
+            raise ValueError("Phone number must be between 70000000000 and 79999999999")
 
         endpoint = f"{self.endpoint_base}/password_login"
         data = {"phone": phone, "password": password}
