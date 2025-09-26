@@ -1,0 +1,88 @@
+site_name: SecretOn API Client Documentation
+site_description: Python client library for SecretOn API
+site_author: Your Name
+site_url: https://your-username.github.io/secreton-api-client
+
+repo_url: https://github.com/your-username/secreton-api-client
+repo_name: secreton-api-client
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - search.highlight
+    - search.share
+    - toc.follow
+    - content.code.copy
+    - content.code.select
+  palette:
+    - scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_root_toc_entry: false
+            merge_init_into_class: true
+          paths: [src]
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quick Start: getting-started/quick-start.md
+      - Authentication: getting-started/authentication.md
+  - Example usage:
+      - Example usage: examples/examples.md
+      - Example Telegram bot: examples/telegram-bot.md
+  - API Reference:
+      - Client: api-reference/client.md
+      - Services: api-reference/services.md
+      - Models: api-reference/models.md
+      - Exceptions: api-reference/exceptions.md
+  - CHANGELOG: CHANGELOG.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - tables
+  - footnotes
+
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/your-username/secreton-api-client
