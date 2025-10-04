@@ -25,7 +25,7 @@ class SyncOrdersService:
     def create_order(
         self,
         order_name: str,
-        service_type: int,
+        service_type: UUID,
         file: Union[BinaryIO, Path, str],
         auth: httpx.Auth,
         comments: Optional[List[str]] = None,
@@ -89,9 +89,7 @@ class SyncOrdersService:
             if isinstance(file, (str, Path)):
                 file_obj.close()
 
-    def get_order(
-        self, order_id: Union[str, UUID], auth: httpx.Auth
-    ) -> OrderViewModel:
+    def get_order(self, order_id: Union[str, UUID], auth: httpx.Auth) -> OrderViewModel:
         """Get order details by ID.
 
         Args:
@@ -183,9 +181,7 @@ class SyncOrdersService:
         response = self.http_client.get(endpoint, auth=auth)
         return [ServiceType(**st) for st in response.json()]
 
-    def summarize_order(
-        self, order_id: Union[str, UUID], auth: httpx.Auth
-    ) -> Dict:
+    def summarize_order(self, order_id: Union[str, UUID], auth: httpx.Auth) -> Dict:
         """Create order summary.
 
         Args:

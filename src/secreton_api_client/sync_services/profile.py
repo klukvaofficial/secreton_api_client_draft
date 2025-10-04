@@ -8,6 +8,7 @@ import httpx
 from ..sync_http_client import SyncHTTPClient
 from ..models.profile import BalanceTopupResponse, UserProfile
 
+
 class SyncProfileService:
     """Synchronous service for profile operations."""
 
@@ -20,7 +21,9 @@ class SyncProfileService:
         self.http_client = http_client
         self.endpoint_base = "/api/profile"
 
-    def get_profile(self, auth: httpx.Auth, user_id: Optional[UUID] = None) -> UserProfile:
+    def get_profile(
+        self, auth: httpx.Auth, user_id: Optional[UUID] = None
+    ) -> UserProfile:
         """Get user profile information.
 
         Args:
@@ -41,17 +44,12 @@ class SyncProfileService:
             params["user_id"] = str(user_id)
 
         response = self.http_client.get(
-            endpoint,
-            auth=auth,
-            params=params if params else None
+            endpoint, auth=auth, params=params if params else None
         )
         return UserProfile(**response.json())
 
     def topup_balance(
-        self,
-        amount: float,
-        auth: httpx.Auth,
-        user_id: Optional[UUID] = None
+        self, amount: float, auth: httpx.Auth, user_id: Optional[UUID] = None
     ) -> BalanceTopupResponse:
         """Top up user balance.
 

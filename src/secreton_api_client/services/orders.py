@@ -25,7 +25,7 @@ class OrdersService:
     async def create_order(
         self,
         order_name: str,
-        service_type: int,
+        service_type: UUID,
         file: Union[BinaryIO, Path, str],
         auth: httpx.Auth,
         comments: Optional[List[str]] = None,

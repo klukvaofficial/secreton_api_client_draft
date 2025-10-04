@@ -44,7 +44,7 @@ class OrderCreateResponse(BaseModel):
 class ServiceType(BaseModel):
     """Available service type."""
 
-    id: int
+    id: UUID
     name: str
     description: Optional[str] = None
     price: Optional[float] = None
