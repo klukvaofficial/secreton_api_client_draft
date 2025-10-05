@@ -112,7 +112,7 @@ class SyncOrdersService:
     def list_orders(
         self,
         auth: httpx.Auth,
-        service_type: Optional[str] = None,
+        service_type: Optional[UUID] = None,
         status: Optional[str] = None,
         tags: Optional[List[str]] = None,
         order: Optional[str] = None,
