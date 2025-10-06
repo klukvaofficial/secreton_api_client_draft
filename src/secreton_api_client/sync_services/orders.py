@@ -64,22 +64,22 @@ class SyncOrdersService:
             filename = getattr(file, "name", "upload")
 
         try:
-            # Prepare multipart form data
+            # Prepare multipart form form_data
             files = {"file": (filename, file_obj, "audio/mpeg")}
-            data = {
+            form_data = {
                 "name": order_name,
-                "service_type": service_type.str(),
+                "service_type": service_type.__str__(),
                 "not_save": not_save,
             }
 
             if comments:
-                data["comments"] = comments
+                form_data["comments"] = comments
             if tags:
-                data["tags"] = tags
+                form_data["tags"] = tags
 
             endpoint = f"{self.endpoint_base}/new"
             response = self.http_client.post(
-                endpoint, auth=auth, data=data, files=files
+                endpoint, auth=auth, form_data=form_data, files=files
             )
 
             return OrderCreateResponse(**response.json())
@@ -157,12 +157,12 @@ class SyncOrdersService:
             Payment response
         """
         endpoint = f"{self.endpoint_base}/pay"
-        data = {"order_id": str(order_id)}
+        form_data = {"order_id": str(order_id)}
 
         response = self.http_client.post(
             endpoint,
             auth=auth,
-            data=data,
+            form_data=form_data,
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
         return response.json()
