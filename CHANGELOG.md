@@ -1,3 +1,9 @@
+## 0.1.8
+
+- fix audio file upload
+- fix create order
+- build 0.1.8
+
 ## 0.1.7
 
 - service_type доп фикс

@@ -65,10 +65,10 @@ class SyncOrdersService:
 
         try:
             # Prepare multipart form data
-            files = {"file": (filename, file_obj, "application/octet-stream")}
+            files = {"file": (filename, file_obj, "audio/mpeg")}
             form_data = {
                 "name": order_name,
-                "service_type": service_type,
+                "service_type": service_type.str(),
                 "not_save": not_save,
             }
 
