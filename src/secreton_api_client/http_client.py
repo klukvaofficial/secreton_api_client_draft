@@ -1,9 +1,10 @@
 """Base HTTP client for Secreton API."""
 
 import logging
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Union, Tuple
 
 import httpx
+from httpx._types import RequestFiles
 
 from .exceptions import (
     APIClientError,
@@ -42,9 +43,10 @@ class HTTPClient:
         self.verify_ssl = verify_ssl
 
         # Setup default headers
+        # Note: Content-Type is not set here as it depends on the request type
+        # (multipart/form-data for files, application/json for JSON, etc.)
         headers = {
             "Accept": "application/json",
-            "Content-Type": "application/json",
         }
 
         if user_agent:
@@ -77,7 +79,7 @@ class HTTPClient:
         auth: Optional[httpx.Auth] = None,
         json_data: Optional[Dict[str, Any]] = None,
         form_data: Optional[Dict[str, Any]] = None,
-        files: Optional[Dict[str, Any]] = None,
+        files: Optional[Tuple[str, Any]] = None,
         params: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
     ) -> httpx.Response:
@@ -120,7 +122,14 @@ class HTTPClient:
             # Handle different data types
             if files:
                 # Multipart form data with files
-                request_kwargs["files"] = files
+                # httpx will automatically set Content-Type to multipart/form-data with boundary
+                logger.info(f"requestfiles start {files}")
+                try:
+                    request_kwargs["files"] = files
+                except Exception as e:
+                    logger.error(f"Request files error: {e}")
+                    raise RequestError(f"Request files error: {str(e)}")
+                logger.info("requestfiles success")
                 if form_data:
                     request_kwargs["data"] = form_data
             elif form_data:
@@ -137,6 +146,8 @@ class HTTPClient:
 
             # Make the request
             response = await self._client.request(**request_kwargs)
+            logger.info(f"Response: {response}")
+            logger.info(f"Response: {response.json()}")
 
             # Handle response errors
             self._handle_response_errors(response)
@@ -267,6 +278,10 @@ class HTTPClient:
         Returns:
             HTTP response
         """
+        logger.info(
+            f"POST request: {endpoint}, {auth}, {json_data}, {form_data}, {files}, {headers}"
+        )
+
         return await self.request(
             "POST",
             endpoint,

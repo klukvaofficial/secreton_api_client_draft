@@ -3,11 +3,14 @@
 from pathlib import Path
 from typing import BinaryIO, Dict, List, Optional, Union
 from uuid import UUID
+import logging
 
 import httpx
 
 from ..http_client import HTTPClient
 from ..models.orders import OrderCreateResponse, OrderViewModel, ServiceType
+
+logger = logging.getLogger(__name__)
 
 
 class OrdersService:
@@ -51,6 +54,7 @@ class OrdersService:
             ValidationError: If parameters are invalid
         """
         # Handle different file input types
+        logger.info(f"File: {file}")
         if isinstance(file, (str, Path)):
             file_path = Path(file)
             if not file_path.exists():
@@ -65,11 +69,18 @@ class OrdersService:
 
         try:
             # Prepare multipart form form_data
+            # logger.info(f"file_obj: {file_obj}")
+            # files = ("file", file_obj)
+            # files = ("file", ("filename", file_obj))
+            # files = ("file", ("filename", file_obj, "application/octet-stream"))
             files = {"file": (filename, file_obj, "application/octet-stream")}
+            # files = {"file": ("filename", file_obj)}
+            # files = {"file": file_obj}
             form_data = {
                 "name": order_name,
                 "service_type": service_type.__str__(),
                 "not_save": not_save,
+                # "file": files["file"],
             }
 
             if comments:
@@ -77,17 +88,23 @@ class OrdersService:
             if tags:
                 form_data["tags"] = tags
 
+            logger.info(f"Form data: {form_data}")
+            # logger.info(f"Files: {files}")
+
             endpoint = f"{self.endpoint_base}/new"
             response = await self.http_client.post(
                 endpoint, auth=auth, form_data=form_data, files=files
             )
 
+            logger.info(f"Response: {response.status_code}")
+
             return OrderCreateResponse(**response.json())
 
         finally:
+            pass
             # Close file if we opened it
-            if isinstance(file, (str, Path)):
-                file_obj.close()
+            # if isinstance(file, (str, Path)):
+            #     file_obj.close()
 
     async def get_order(
         self, order_id: Union[str, UUID], auth: httpx.Auth
@@ -158,13 +175,12 @@ class OrdersService:
         Returns:
             Payment response
         """
-        endpoint = f"{self.endpoint_base}/pay"
-        form_data = {"order_id": str(order_id)}
+        endpoint = f"{self.endpoint_base}/pay?order_id={order_id}"
+        # form_data = {"order_id": str(order_id)}
 
         response = await self.http_client.post(
             endpoint,
             auth=auth,
-            form_data=form_data,
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
         return response.json()
