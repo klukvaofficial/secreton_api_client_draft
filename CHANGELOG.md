@@ -1,3 +1,8 @@
+## 0.1.10
+
+- fix audio file upload
+- build 0.1.10
+
 ## 0.1.9
 
 - fix audio file upload

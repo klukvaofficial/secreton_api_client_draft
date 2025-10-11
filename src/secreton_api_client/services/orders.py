@@ -57,7 +57,7 @@ class OrdersService:
                 raise FileNotFoundError(f"File not found: {file_path}")
             if not file_path.is_file():
                 raise ValueError(f"Path is not a file: {file_path}")
-            file_obj = file_path.open("rb")
+            file_obj = file_path.read_bytes()
             filename = file_path.name
         else:
             file_obj = file
@@ -65,7 +65,7 @@ class OrdersService:
 
         try:
             # Prepare multipart form form_data
-            files = {"file": (filename, file_obj, "audio/mpeg")}
+            files = {"file": (filename, file_obj, "application/octet-stream")}
             form_data = {
                 "name": order_name,
                 "service_type": service_type.__str__(),
