@@ -6,6 +6,7 @@ from typing import Dict, List
 
 import httpx
 
+
 class HealthChecker:
     """Simple health checker for API endpoints."""
 
@@ -14,7 +15,6 @@ class HealthChecker:
         self.endpoints = [
             # Public endpoints (no auth required)
             "/api/auth/login",
-
             # These might require auth, but we can check if they respond
             "/api/orders/service_types",
             "/api/profile/profile",
@@ -40,7 +40,7 @@ class HealthChecker:
                 "status": "reachable",
                 "status_code": response.status_code,
                 "response_time_ms": round(elapsed, 2),
-                "error": None
+                "error": None,
             }
 
         except httpx.TimeoutException:
@@ -50,7 +50,7 @@ class HealthChecker:
                 "status": "timeout",
                 "status_code": None,
                 "response_time_ms": round(elapsed, 2),
-                "error": "Request timed out"
+                "error": "Request timed out",
             }
 
         except httpx.ConnectError:
@@ -60,7 +60,7 @@ class HealthChecker:
                 "status": "unreachable",
                 "status_code": None,
                 "response_time_ms": round(elapsed, 2),
-                "error": "Cannot connect to server"
+                "error": "Cannot connect to server",
             }
 
         except Exception as e:
@@ -70,7 +70,7 @@ class HealthChecker:
                 "status": "error",
                 "status_code": None,
                 "response_time_ms": round(elapsed, 2),
-                "error": str(e)
+                "error": str(e),
             }
 
     async def check_all(self) -> List[Dict]:
@@ -96,7 +96,9 @@ class HealthChecker:
                     elif status_code in [401, 403]:
                         print(f"🔒 {status_code} - Auth required ({response_time}ms)")
                     elif status_code == 422:
-                        print(f"📝 {status_code} - Validation error ({response_time}ms)")
+                        print(
+                            f"📝 {status_code} - Validation error ({response_time}ms)"
+                        )
                     elif status_code == 404:
                         print(f"❓ {status_code} - Not found ({response_time}ms)")
                     else:
@@ -132,7 +134,12 @@ class HealthChecker:
         print(f"💥 Errors: {errors}")
 
         if reachable > 0:
-            avg_response_time = sum(r["response_time_ms"] for r in results if r["status"] == "reachable") / reachable
+            avg_response_time = (
+                sum(
+                    r["response_time_ms"] for r in results if r["status"] == "reachable"
+                )
+                / reachable
+            )
             print(f"📊 Average Response Time: {avg_response_time:.2f}ms")
 
         # Status code distribution
@@ -147,15 +154,17 @@ class HealthChecker:
             for code, count in sorted(status_codes.items()):
                 print(f"  {code}: {count}")
 
+
 async def main():
     """Run health check."""
     import os
 
-    BASE_URL = os.getenv("SECRETON_API_URL", "https://api.secreton.com")
+    BASE_URL = os.getenv("SECRETON_API_URL", "http://176.114.89.94:5648")
 
     checker = HealthChecker(BASE_URL)
     results = await checker.check_all()
     checker.print_summary(results)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -18,6 +18,7 @@ from .exceptions import (
 
 logger = logging.getLogger(__name__)
 
+
 class HTTPClient:
     """Low-level HTTP client for API communication."""
 
@@ -98,7 +99,7 @@ class HTTPClient:
         Raises:
             APIClientError: For various API and network errors
         """
-        url = endpoint if endpoint.startswith('http') else f"{self.base_url}{endpoint}"
+        url = endpoint if endpoint.startswith("http") else f"{self.base_url}{endpoint}"
 
         logger.debug(f"Making {method} request to {url}")
 
@@ -125,9 +126,13 @@ class HTTPClient:
             elif form_data:
                 # Form data only
                 request_kwargs["data"] = form_data
-                request_kwargs["headers"] = {"Content-Type": "application/x-www-form-urlencoded"}
+                if "headers" not in request_kwargs:
+                    request_kwargs["headers"] = {}
+                request_kwargs["headers"]["Content-Type"] = (
+                    "application/x-www-form-urlencoded"
+                )
             elif json_data:
-                # JSON data
+                # JSON data - httpx will automatically set Content-Type to application/json
                 request_kwargs["json"] = json_data
 
             # Make the request
@@ -236,7 +241,9 @@ class HTTPClient:
         Returns:
             HTTP response
         """
-        return await self.request("GET", endpoint, auth=auth, params=params, headers=headers)
+        return await self.request(
+            "GET", endpoint, auth=auth, params=params, headers=headers
+        )
 
     async def post(
         self,
@@ -267,7 +274,7 @@ class HTTPClient:
             json_data=json_data,
             form_data=form_data,
             files=files,
-            headers=headers
+            headers=headers,
         )
 
     async def delete(
@@ -288,4 +295,6 @@ class HTTPClient:
         Returns:
             HTTP response
         """
-        return await self.request("DELETE", endpoint, auth=auth, json_data=json_data, headers=headers)
+        return await self.request(
+            "DELETE", endpoint, auth=auth, json_data=json_data, headers=headers
+        )
