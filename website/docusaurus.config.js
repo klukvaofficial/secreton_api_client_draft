@@ -42,7 +42,7 @@ const config = {
                     sidebarPath: require.resolve('./sidebars.js'),
                     // Please change this to your repo.
                     // Remove this to remove the "edit this page" links.
-                    editUrl: 'https://github.com/your-username/secreton-api-client/tree/main/',
+                    editUrl: 'https://github.com/klukvaofficial/secreton_api_client_draft',
                 },
                 blog: false,
                 theme: {
@@ -72,7 +72,7 @@ const config = {
                     label: 'Documentation',
                 },
                 {
-                    href: 'https://github.com/your-username/secreton-api-client',
+                    href: 'https://github.com/klukvaofficial/secreton_api_client_draft',
                     label: 'GitHub',
                     position: 'right',
                 },
@@ -96,7 +96,7 @@ const config = {
                     title: 'Community',
                     items: [{
                         label: 'GitHub',
-                        href: 'https://github.com/your-username/secreton-api-client',
+                        href: 'https://github.com/klukvaofficial/secreton_api_client_draft',
                     }, ],
                 },
             ],
