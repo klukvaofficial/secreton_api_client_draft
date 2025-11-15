@@ -286,7 +286,7 @@ export SECRETON_TIMEOUT="30"
 ## 📞 Поддержка
 
 - 📧 **Email**: support@secreton.ru
-- 📚 **Документация**: [Документация библиотеки](https://klukvaofficial.github.io/secreton_api_client_draft/) | [API Reference](https://docs.secreton.ru/docs/api-reference/client)
+- 📚 **Документация**: [Документация библиотеки](https://klukvaofficial.github.io/secreton_api_client_draft/) | [API Reference](https://klukvaofficial.github.io/secreton_api_client_draft/docs/api-reference)
 - 🐛 **Баг-репорты**: [GitHub Issues](https://github.com/secreton/python-client/issues)
 - 💬 **Telegram**: [@secreton_support](https://t.me/secreton_support)
 
