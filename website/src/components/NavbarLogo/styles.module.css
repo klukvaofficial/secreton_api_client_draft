@@ -1,0 +1,27 @@
+.logo {
+  font-size: 21.33px;
+  font-weight: 600;
+  line-height: 32px;
+  text-align: center;
+  color: var(--ifm-color-content);
+  margin: 0;
+  font-family: 'Open Sans', 'Inter', sans-serif;
+}
+
+.logoGradient {
+  background: radial-gradient(
+    71.2% 218.04% at 71.2% 0%,
+    #3c94fc 0%,
+    #1b53f4 100%
+  );
+  font-size: inherit;
+  font-weight: 700;
+  line-height: 32px;
+  text-align: center;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-left: 4px;
+}
+

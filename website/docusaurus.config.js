@@ -61,7 +61,9 @@ const config = {
         logo: {
           alt: 'SecretOn API Client Logo',
           src: 'img/logo.svg',
+          srcDark: 'img/logo.svg',
         },
+        hideOnScroll: false,
         items: [
           {
             type: 'docSidebar',
