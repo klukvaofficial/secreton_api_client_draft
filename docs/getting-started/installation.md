@@ -26,7 +26,7 @@ uv add secreton-api-client
 ## Установка из исходного кода
 
 ```bash
-git clone https://github.com/your-username/secreton-api-client.git
+git clone https://github.com/klukvaofficial/secreton_api_client_draft.git
 cd secreton-api-client
 pip install -e .
 ```

@@ -5,7 +5,6 @@ on:
     branches: [main, master, feat/docusaurus]
     paths:
       - "website/**"
-      - "docs/**"
       - "scripts/generate_api_docs.py"
       - "src/secreton_api_client/**"
       - ".github/workflows/docs.yml"
@@ -13,7 +12,6 @@ on:
     branches: [main, master]
     paths:
       - "website/**"
-      - "docs/**"
       - "scripts/generate_api_docs.py"
       - "src/secreton_api_client/**"
       - ".github/workflows/docs.yml"
