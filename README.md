@@ -7,7 +7,7 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Documentation](https://img.shields.io/badge/docs-docusaurus-blue.svg)](https://klukvaofficial.github.io/secreton-api-client/)
+[![Documentation](https://img.shields.io/badge/docs-docusaurus-blue.svg)](https://klukvaofficial.github.io/secreton_api_client_draft/)
 
 ## ⚡ Быстрый старт
 
@@ -286,7 +286,7 @@ export SECRETON_TIMEOUT="30"
 ## 📞 Поддержка
 
 - 📧 **Email**: support@secreton.ru
-- 📚 **Документация**: [Документация библиотеки](https://klukvaofficial.github.io/secreton-api-client/) | [API Reference](https://docs.secreton.ru/docs/api-reference/client)
+- 📚 **Документация**: [Документация библиотеки](https://klukvaofficial.github.io/secreton_api_client_draft/) | [API Reference](https://docs.secreton.ru/docs/api-reference/client)
 - 🐛 **Баг-репорты**: [GitHub Issues](https://github.com/secreton/python-client/issues)
 - 💬 **Telegram**: [@secreton_support](https://t.me/secreton_support)
 
@@ -301,6 +301,6 @@ export SECRETON_TIMEOUT="30"
 
 <div align="center">
 
-**[🏠 Главная](https://secreton.ru) • [📖 Документация](https://klukvaofficial.github.io/secreton-api-client/) • [🛠️ API Reference](https://docs.secreton.ru/docs/api-reference/client) • [💬 Поддержка](https://t.me/secreton_support)**
+**[🏠 Главная](https://secreton.ru) • [📖 Документация](https://klukvaofficial.github.io/secreton_api_client_draft/) • [🛠️ API Reference](https://docs.secreton.ru/docs/api-reference/client) • [💬 Поддержка](https://t.me/secreton_support)**
 
 Сделано с ❤️ командой [Secreton](https://secreton.ru)
