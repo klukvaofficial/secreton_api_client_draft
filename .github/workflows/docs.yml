@@ -22,20 +22,36 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: website/package.json
+
+      - name: Setup Python environment
         run: |
           pip install --upgrade pip
-          pip install mkdocs mkdocs-material "mkdocstrings[python]" mkdocs-autorefs
+          pip install -e .
+
+      - name: Generate API documentation
+        run: |
+          python scripts/generate_api_docs.py
+
+      - name: Install Docusaurus dependencies
+        working-directory: website
+        run: npm ci
 
       - name: Build documentation
-        run: mkdocs build --strict
+        working-directory: website
+        run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./site
+          path: ./website/build
 
   deploy:
     if: github.ref == 'refs/heads/main'

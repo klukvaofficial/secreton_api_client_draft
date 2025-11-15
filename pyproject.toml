@@ -2,18 +2,9 @@
 name = "secreton-api-client"
 description = "Official Python client for Secreton API - Speech-To-Text and Summarization service"
 readme = "README.md"
-authors = [
-    { name = "saner99", email = "it@saner99.ru" }
-]
+authors = [{ name = "saner99", email = "it@saner99.ru" }]
 requires-python = ">=3.9"
-dependencies = [
-    "httpx>=0.28.1",
-    "mkdocs>=1.6.1",
-    "mkdocs-autorefs>=1.4.3",
-    "mkdocs-material>=9.6.20",
-    "mkdocstrings[python]>=0.30.1",
-    "pydantic>=2.11.7",
-]
+dependencies = ["httpx>=0.28.1", "pydantic>=2.11.7"]
 
 keywords = ["secreton", "api", "client", "document", "processing"]
 classifiers = [
@@ -54,16 +45,13 @@ dev = [
     "pytest-asyncio>=1.1.0",
     "respx>=0.22.0",
 ]
+docs = []
 
 [tool.hatch.version]
 path = "src/secreton_api_client/_version.py"
 
 [tool.hatch.build.targets.sdist]
-include = [
-    "/src",
-    "/README.md",
-    "/LICENSE",
-]
+include = ["/src", "/README.md", "/LICENSE"]
 
 [tool.black]
 line-length = 100
